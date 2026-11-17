@@ -1,0 +1,17 @@
+# ---------- Vite UI (static) ----------
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY ./dashboard/package*.json ./
+RUN npm ci
+COPY ./dashboard/ ./
+# Pass Vite env variables for build
+ARG VITE_OPENPANEL_API_URL=https://api.openpanel.example.com
+ARG VITE_OPENPANEL_CLIENT_ID=your_openpanel_client_id
+ENV VITE_OPENPANEL_API_URL=${VITE_OPENPANEL_API_URL}
+ENV VITE_OPENPANEL_CLIENT_ID=${VITE_OPENPANEL_CLIENT_ID}
+RUN npm run build   # produces /app/dist
+
+# Serve with Nginx
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80

@@ -4,7 +4,7 @@ import re
 import subprocess
 import time
 from typing import List
-from google import genai
+import google.genai as genai
 from google.genai import types
 from pydantic import BaseModel
 

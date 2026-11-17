@@ -4,7 +4,7 @@ import uuid
 import json
 from concurrent.futures import ThreadPoolExecutor
 
-from google import genai
+import google.genai as genai
 from google.genai import types
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 

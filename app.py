@@ -29,7 +29,17 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from starlette.background import BackgroundTask
 from pydantic import BaseModel
-from s3_uploader import upload_job_artifacts, list_all_clips, upload_actor_to_s3, list_actor_gallery, upload_video_to_gallery, list_video_gallery
+try:
+    from s3_uploader import (
+        upload_job_artifacts,
+        list_all_clips,
+        upload_actor_to_s3,
+        list_actor_gallery,
+        upload_video_to_gallery,
+        list_video_gallery,
+    )
+except Exception:
+    upload_job_artifacts = list_all_clips = upload_actor_to_s3 = list_actor_gallery = upload_video_to_gallery = list_video_gallery = None
 import recut
 import layout_ranges
 import watermarked
@@ -4898,6 +4908,7 @@ async def _run_job_remote(job_id, job_data):
                 logs.append(REMOTE_LOST_LOG)
 
 
+@app.get("/healthz")
 @app.get("/health")
 async def health():
     """Lightweight liveness probe for uptime monitoring."""

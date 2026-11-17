@@ -6,8 +6,9 @@ import sys
 from typing import List, Optional
 
 from dotenv import load_dotenv
-from google import genai
+import google.genai as genai
 from google.genai import types as genai_types
+
 from pydantic import BaseModel
 
 from clip_selection import (clip_count_targets, clip_duration_bounds,

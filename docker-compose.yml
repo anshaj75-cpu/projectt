@@ -1,34 +1,25 @@
 services:
   backend:
-    build: .
-    container_name: openshorts-backend
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-      - /app/__pycache__
-      - ./output:/app/output
-    restart: unless-stopped
-
-  frontend:
     build:
-      context: ./dashboard
-      target: dev
-    container_name: openshorts-frontend
-    ports:
-      - "5175:5173"
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - .env
     volumes:
-      - ./dashboard:/app
-      - /app/node_modules
+      - ./output:/app/output
+    ports:
+      - "127.0.0.1:8000:8000"
     restart: unless-stopped
-    depends_on:
-      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   renderer:
     build:
       context: .
       dockerfile: render-service/Dockerfile
-    container_name: openshorts-renderer
     ports:
       - "3100:3100"
     volumes:
@@ -37,6 +28,27 @@ services:
       - REMOTION_BUNDLE_PATH=/app/remotion
       - OUTPUT_DIR=/output
       - PORT=3100
+    depends_on:
+      backend:
+        condition: service_healthy
     restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_OPENPANEL_API_URL: ${VITE_OPENPANEL_API_URL}
+        VITE_OPENPANEL_CLIENT_ID: ${VITE_OPENPANEL_CLIENT_ID}
+    ports:
+      - "127.0.0.1:5175:80"
     depends_on:
       - backend
+    restart: unless-stopped
+    environment:
+      - VITE_OPENPANEL_API_URL=${VITE_OPENPANEL_API_URL}
+      - VITE_OPENPANEL_CLIENT_ID=${VITE_OPENPANEL_CLIENT_ID}
+
+networks:
+  default:
+    driver: bridge

@@ -47,7 +47,9 @@ skills-lock.json
 .env.cloud.example
 .worktrees
 
-# Instrucciones locales con datos de infra (repo público)
+# Executables & Local tools
+*.exe
+port_forwarder.py
 CLAUDE.local.md
 
 # Rust build output
